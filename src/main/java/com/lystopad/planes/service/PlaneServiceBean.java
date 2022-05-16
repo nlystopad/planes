@@ -3,15 +3,18 @@ package com.lystopad.planes.service;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.repository.PlaneRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PlaneServiceBean implements PlaneService {
 
     private final PlaneRepository planeRepository;
@@ -30,7 +33,7 @@ public class PlaneServiceBean implements PlaneService {
 
     @Override
     public Plane getById(Integer id) {
-        return planeRepository.getById(id);
+        return planeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Plane with this ID doesn't exist"));
     }
 
     @Override
@@ -57,6 +60,29 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public void removeAll() {
         planeRepository.deleteAll();
+    }
+
+    @Override
+    public Collection<Plane> findPlaneByName(String name) {
+        log.info("findPlaneByName() - start: name = {}", name);
+        Collection<Plane> collection = planeRepository.findByName(name);
+        log.info("findPlaneByName() - end: collection = {}", collection);
+        return collection;
+    }
+
+    @Override
+    public Collection<Plane> findPlaneByFighter() {
+        log.info("findPlaneByFighter() - start");
+        Collection<Plane> collection = planeRepository.findByFighter();
+        log.info("findPlaneByFighter() - end: collection = {}", collection);
+        return collection;
+    }
+
+    @Override
+    public void updateDate(Integer id, LocalDateTime dateTime) {
+        log.info("updateDate() - start");
+        planeRepository.updatePlane(id, dateTime);
+        log.info("updateDate() - end");
     }
 
 
