@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -33,8 +34,12 @@ public class PlaneController {
 
     @GetMapping("/planes/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Plane getById(@PathVariable Integer id) {
-        return planeService.getById(id);
+    public String getById(@PathVariable Integer id) {        // add message to client "plane is deleted"
+        try {
+           return planeService.getById(id).toString();
+        } catch (EntityNotFoundException e) {
+             return e.getLocalizedMessage();
+        }
     }
 
     @PutMapping("/planes/{id}")
@@ -43,7 +48,7 @@ public class PlaneController {
         return planeService.updateById(plane, id);
     }
 
-    @DeleteMapping("/planes/{id}")
+    @PatchMapping("/planes/{id}/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeById(@PathVariable Integer id) {
         planeService.removeById(id);

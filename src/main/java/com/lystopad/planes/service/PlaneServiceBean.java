@@ -33,8 +33,13 @@ public class PlaneServiceBean implements PlaneService {
 
     @Override
     public Plane getById(Integer id) {
-        return planeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Plane with this ID doesn't exist"));
+        if (returnPlane(id).getDeleted().equals(null) || returnPlane(id).getDeleted()) {
+            throw new EntityNotFoundException("Plane was deleted");
+        }
+        return returnPlane(id);
     }
+
+
 
     @Override
     public Plane updateById(Plane plane, Integer id) {
@@ -49,12 +54,12 @@ public class PlaneServiceBean implements PlaneService {
                     return planeRepository.save(entity);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Plane with this ID doesn't exist"));
-
     }
 
     @Override
     public void removeById(Integer id) {
-        planeRepository.deleteById(id);
+        returnPlane(id).setDeleted(Boolean.TRUE);
+        planeRepository.save(returnPlane(id));
     }
 
     @Override
@@ -64,7 +69,7 @@ public class PlaneServiceBean implements PlaneService {
 
     @Override
     public Collection<Plane> findPlaneByName(String name) {
-        log.info("findPlaneByName() - start: name = {}", name);
+        log.debug("findPlaneByName() - start: name = {}", name);
         Collection<Plane> collection = planeRepository.findByName(name);
         log.info("findPlaneByName() - end: collection = {}", collection);
         return collection;
@@ -98,5 +103,12 @@ public class PlaneServiceBean implements PlaneService {
         }
     }
 
-
+    /**
+     * technical method that return Plane by id or throw EntityNotFoundException
+     * @param id - id of plane that should be returned
+     * @return Plane
+     */
+    private Plane returnPlane(Integer id) {
+        return planeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Plane with such id doesn't exist"));
+    }
 }

@@ -1,9 +1,11 @@
 package com.lystopad.planes.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "planes")
@@ -18,6 +20,8 @@ public class Plane {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime creationDate;
     private int crewQuantity;
+    @JsonIgnore
+    private Boolean isDeleted;
 
     public Integer getId() {
         return id;
@@ -65,5 +69,38 @@ public class Plane {
 
     public void setCrewQuantity(int crewQuantity) {
         this.crewQuantity = crewQuantity;
+    }
+
+    @JsonIgnore
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Plane)) return false;
+        Plane plane = (Plane) o;
+        return getAmmunition() == plane.getAmmunition() && isFighter() == plane.isFighter() && getCrewQuantity() == plane.getCrewQuantity() && getId().equals(plane.getId()) && getName().equals(plane.getName()) && getCreationDate().equals(plane.getCreationDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getAmmunition(), isFighter(), getCreationDate(), getCrewQuantity());
+    }
+
+    @Override
+    public String toString() {
+        return "Plane {" +
+                "id = " + id +
+                ", name = '" + name + '\'' +
+                ", ammunition = " + ammunition +
+                ", isFighter = " + isFighter +
+                ", creationDate = " + creationDate +
+                ", crewQuantity = " + crewQuantity + "}";
     }
 }
