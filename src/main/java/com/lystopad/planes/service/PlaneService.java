@@ -20,7 +20,7 @@ public interface PlaneService {
 
     void removeAll();
 
-    Collection<Plane> findPlaneByName(String name);
+    Plane findPlaneByName(String name);
 
     Collection<Plane> findPlaneByFighter();
 

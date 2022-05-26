@@ -3,12 +3,12 @@ package com.lystopad.planes.web;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.service.PlaneService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -16,6 +16,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
+@Slf4j
 public class PlaneController {
 
     private final PlaneService planeService;
@@ -34,12 +35,12 @@ public class PlaneController {
 
     @GetMapping("/planes/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String getById(@PathVariable Integer id) {        // add message to client "plane is deleted"
-        try {
-           return planeService.getById(id).toString();
-        } catch (EntityNotFoundException e) {
-             return e.getLocalizedMessage();
-        }
+    public Plane getById(@PathVariable Integer id) {
+        log.debug("getById() Controller - start: id = {}", id);
+        Plane plane = planeService.getById(id);
+        log.debug("getById() Controller - end: name = {}", plane.getName());
+        return plane;
+
     }
 
     @PutMapping("/planes/{id}")
@@ -62,7 +63,7 @@ public class PlaneController {
 
     @GetMapping(value = "/planes", params = {"name"})
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Plane> findPlaneByName(String name) {
+    public Plane findPlaneByName(String name) {
         return planeService.findPlaneByName(name);
     }
 

@@ -2,6 +2,9 @@ package com.lystopad.planes.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,6 +12,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "planes")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Plane {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -21,7 +27,7 @@ public class Plane {
     private LocalDateTime creationDate;
     private int crewQuantity;
     @JsonIgnore
-    private Boolean isDeleted;
+    private Boolean isDeleted = Boolean.FALSE;
 
     public Integer getId() {
         return id;

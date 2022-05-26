@@ -18,3 +18,11 @@ spring:
 # Server configuration
 server:
   port: 8087 #set your port
+# Logger configuration
+logging:
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+  level:
+    org.springframework: info
+    org.hibernate: info
+    com.lystopad.planes: info

@@ -12,16 +12,16 @@ import java.util.Collection;
 import java.util.List;
 
 
-@Service
+
 @AllArgsConstructor
 @Slf4j
+@Service
 public class PlaneServiceBean implements PlaneService {
 
     private final PlaneRepository planeRepository;
 
     @Override
     public Plane create(Plane plane) {
-        checkDateOfCreation(plane);
         return planeRepository.save(plane);
     }
 
@@ -33,17 +33,25 @@ public class PlaneServiceBean implements PlaneService {
 
     @Override
     public Plane getById(Integer id) {
-        if (returnPlane(id).getDeleted().equals(null) || returnPlane(id).getDeleted()) {
-            throw new EntityNotFoundException("Plane was deleted");
-        }
+        log.info("getById() - start: id = {}", id);
+        Plane plane = returnPlane(id);
+        log.debug("getById() -> checkDeleted() - start: id = {}", id);
+        checkDeleted(plane);
+        log.info("getById() - end: plane = {}", plane);
         return returnPlane(id);
     }
 
+    private void checkDeleted(Plane plane) {
+        log.info("checkDeleted() - start: id = {}", plane.getId());
+        if (plane.getDeleted() == null || plane.getDeleted()) {
+            throw new EntityNotFoundException("Plane was deleted");
+        }
+        log.info("checkDeleted() - end: id = {}", plane.getId());
+    }
 
 
     @Override
     public Plane updateById(Plane plane, Integer id) {
-        checkDateOfCreation(plane);
         return planeRepository.findById(id)
                 .map(entity -> {
                     entity.setAmmunition(plane.getAmmunition());
@@ -68,11 +76,11 @@ public class PlaneServiceBean implements PlaneService {
     }
 
     @Override
-    public Collection<Plane> findPlaneByName(String name) {
-        log.debug("findPlaneByName() - start: name = {}", name);
-        Collection<Plane> collection = planeRepository.findByName(name);
-        log.info("findPlaneByName() - end: collection = {}", collection);
-        return collection;
+    public Plane findPlaneByName(String name) {
+        log.info("findPlaneByName() - start: name = {}", name);
+        Plane plane = planeRepository.findByName(name);
+        log.info("findPlaneByName() - end: collection = {}", plane);
+        return plane;
     }
 
     @Override
@@ -91,20 +99,10 @@ public class PlaneServiceBean implements PlaneService {
     }
 
 
-    /**
-     * technical method that checks current plane's date of creation
-     *
-     * @param plane - plane to check
-     */
-    private void checkDateOfCreation(Plane plane) {
-        if (plane.getCreationDate().isBefore(LocalDateTime.of(1970, 1, 1, 0, 0))) {
-            // todo: create my own exception to throw
-            throw new RuntimeException("Plane is too old, you should utilize it");
-        }
-    }
 
     /**
      * technical method that return Plane by id or throw EntityNotFoundException
+     *
      * @param id - id of plane that should be returned
      * @return Plane
      */

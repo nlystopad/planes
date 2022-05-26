@@ -12,9 +12,9 @@ import java.util.List;
 
 @Repository
 public interface PlaneRepository extends JpaRepository<Plane, Integer> {
-    List<Plane> findByName(String name);
+    Plane findByName(String name);
 
-    @Query("select p from Plane p where p.isFighter = false")
+    @Query("select p from Plane p where p.isFighter = true")
     List<Plane> findByFighter();
 
     @Modifying
