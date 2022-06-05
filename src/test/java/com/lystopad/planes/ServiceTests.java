@@ -3,6 +3,7 @@ package com.lystopad.planes;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.repository.PlaneRepository;
 import com.lystopad.planes.service.PlaneServiceBean;
+import com.lystopad.planes.utils.exception.ResourceNotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -10,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ public class ServiceTests {
         verify(repository, times(2)).findById(plane.getId());
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void shouldThrowExceptionWhenPlaneDoesntExist(){
         Plane plane = new Plane();
         plane.setId(25);

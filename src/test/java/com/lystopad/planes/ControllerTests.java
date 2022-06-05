@@ -1,15 +1,16 @@
 package com.lystopad.planes;
 
-import com.lystopad.planes.domain.Plane;
-import com.lystopad.planes.repository.PlaneRepository;
-import com.lystopad.planes.web.PlaneController;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
+import com.lystopad.planes.domain.Plane;
+import com.lystopad.planes.dto.PlaneDto;
+import com.lystopad.planes.utils.config.PlaneConverter;
+import com.lystopad.planes.web.PlaneController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,68 +18,72 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(PlaneController.class)
+@SpringBootTest(classes = PlanesApplication.class)
+@AutoConfigureMockMvc
 public class ControllerTests {
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
     ObjectMapper mapper;
     @MockBean
-    PlaneRepository repository;
+    private PlaneController controller;
+    @Autowired
+    private PlaneConverter converter;
 
-    @Ignore
+
     @Test
     public void createPlaneSuccess() throws Exception {
-        Plane plane = Plane.builder().name("F-18").build();
+        Plane plane = Plane.builder().name("F-18").isFighter(true).creationDate(LocalDateTime.now()).ammunition(5).build();
+        PlaneDto dto = converter.toDto(plane);
+        Mockito.when(controller.createPlane(dto)).thenReturn(dto);
 
-        Mockito.when(repository.save(plane)).thenReturn(plane);
+        MockHttpServletRequestBuilder mockRequest = post("/api/planes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writer().withDefaultPrettyPrinter().writeValueAsString(dto));
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(plane));
-
-        mockMvc.perform(mockRequest).andExpect(status().isOk()).andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.name", is("F-18")));
+        mockMvc.perform(mockRequest)
+                .andExpect(status().is(201));
     }
 
-    @Ignore
     @Test
     public void getPlaneByIdSuccess() throws Exception {
         Plane plane = Plane.builder().name("F-16").ammunition(5).build();
+        PlaneDto dto = converter.toDto(plane);
 
-        Mockito.when(repository.findById(plane.getId())).thenReturn(Optional.of(plane));
+        Mockito.when(controller.getById(plane.getId())).thenReturn(dto);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/planes/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.name", is("F-16")));
+                .andExpect(status().isOk());
 
     }
 
-    @Ignore
     @Test
     public void getAllPlanesSuccess() throws Exception {
         Plane plane = Plane.builder().name("F-18").isFighter(true).build();
+        PlaneDto dto = converter.toDto(plane);
 
-        List<Plane> records = new ArrayList<>(List.of(plane));
+        Collection<Plane> records = new ArrayList<>(List.of(plane));
 
-        repository.save(plane);
+        controller.createPlane(dto);
 
-        Mockito.when(repository.findAll()).thenReturn(records);
+        Mockito.when(controller.getAll()).thenReturn(records);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/planes").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/planes").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[2].name", is("F-18")));
+                .andExpect(jsonPath("$[0].name", is("F-18")));
     }
 }

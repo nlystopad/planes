@@ -1,7 +1,10 @@
 package com.lystopad.planes.web;
 
 import com.lystopad.planes.domain.Plane;
+import com.lystopad.planes.dto.PlaneDeleteDto;
+import com.lystopad.planes.dto.PlaneDto;
 import com.lystopad.planes.service.PlaneService;
+import com.lystopad.planes.utils.config.PlaneConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -21,10 +25,13 @@ public class PlaneController {
 
     private final PlaneService planeService;
 
+    private final PlaneConverter converter;
+
     @PostMapping("/planes")
     @ResponseStatus(HttpStatus.CREATED)
-    public Plane createPlane(@RequestBody Plane plane) {
-        return planeService.create(plane);
+    public PlaneDto createPlane(@RequestBody @Valid PlaneDto planeForSave) {
+        Plane plane = converter.getMapperFacade().map(planeForSave, Plane.class);
+        return converter.toDto(planeService.create(plane));
     }
 
     @GetMapping("/planes")
@@ -35,36 +42,40 @@ public class PlaneController {
 
     @GetMapping("/planes/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Plane getById(@PathVariable Integer id) {
+    public PlaneDto getById(@PathVariable Integer id) {
         log.debug("getById() Controller - start: id = {}", id);
         Plane plane = planeService.getById(id);
-        log.debug("getById() Controller - end: name = {}", plane.getName());
-        return plane;
+        log.debug("getById() Controller - to dto start: id = {}", id);
+        PlaneDto dto = converter.toDto(plane);
+        log.debug("getById() Controller - end: name = {}", dto.name);
+        return dto;
 
     }
 
     @PutMapping("/planes/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Plane updateById(@RequestBody Plane plane, @PathVariable Integer id) {
-        return planeService.updateById(plane, id);
+    public PlaneDto updateById(@RequestBody @Valid PlaneDto planeForUpdate, @PathVariable Integer id) {
+        log.debug("updateById() Controller - start: id = {}", id);
+        Plane plane = converter.getMapperFacade().map(planeForUpdate, Plane.class);
+        log.debug("updateById() Controller - end: id = {}", id);
+        return converter.toDto(planeService.updateById(plane, id));
     }
 
     @PatchMapping("/planes/{id}/delete")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeById(@PathVariable Integer id) {
+    @ResponseStatus(HttpStatus.OK)
+    public PlaneDeleteDto removeById(@PathVariable Integer id) {
         planeService.removeById(id);
+        return converter.toDeleteDto(planeService.getById(id));
     }
 
-    @DeleteMapping("/planes")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAll() {
-        planeService.removeAll();
-    }
 
     @GetMapping(value = "/planes", params = {"name"})
     @ResponseStatus(HttpStatus.OK)
-    public Plane findPlaneByName(String name) {
-        return planeService.findPlaneByName(name);
+    public PlaneDto findPlaneByName(String name) {
+        log.debug("findPlaneByName() Controller - start: name = {}", name);
+        PlaneDto dto = converter.toDto(planeService.findPlaneByName(name));
+        log.debug("findPlaneByName() Controller - end: id = {}", planeService.findPlaneByName(name).getId());
+        return dto;
     }
 
     @GetMapping(value = "/planes/fighters")

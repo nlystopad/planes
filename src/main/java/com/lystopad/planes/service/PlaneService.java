@@ -18,7 +18,6 @@ public interface PlaneService {
 
     void removeById(Integer id);
 
-    void removeAll();
 
     Plane findPlaneByName(String name);
 
