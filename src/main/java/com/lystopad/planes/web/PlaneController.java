@@ -4,7 +4,7 @@ import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.dto.PlaneDeleteDto;
 import com.lystopad.planes.dto.PlaneDto;
 import com.lystopad.planes.service.PlaneService;
-import com.lystopad.planes.utils.config.PlaneConverter;
+import com.lystopad.planes.utils.config.PlaneMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,13 +25,11 @@ public class PlaneController {
 
     private final PlaneService planeService;
 
-    private final PlaneConverter converter;
-
     @PostMapping("/planes")
     @ResponseStatus(HttpStatus.CREATED)
     public PlaneDto createPlane(@RequestBody @Valid PlaneDto planeForSave) {
-        Plane plane = converter.getMapperFacade().map(planeForSave, Plane.class);
-        return converter.toDto(planeService.create(plane));
+        Plane plane = PlaneMapper.INSTANCE.planeDtoToPlane(planeForSave);;
+        return PlaneMapper.INSTANCE.planeToPlaneDto(plane);
     }
 
     @GetMapping("/planes")
@@ -46,7 +44,7 @@ public class PlaneController {
         log.debug("getById() Controller - start: id = {}", id);
         Plane plane = planeService.getById(id);
         log.debug("getById() Controller - to dto start: id = {}", id);
-        PlaneDto dto = converter.toDto(plane);
+        PlaneDto dto = PlaneMapper.INSTANCE.planeToPlaneDto(plane);
         log.debug("getById() Controller - end: name = {}", dto.name);
         return dto;
 
@@ -56,16 +54,17 @@ public class PlaneController {
     @ResponseStatus(HttpStatus.OK)
     public PlaneDto updateById(@RequestBody @Valid PlaneDto planeForUpdate, @PathVariable Integer id) {
         log.debug("updateById() Controller - start: id = {}", id);
-        Plane plane = converter.getMapperFacade().map(planeForUpdate, Plane.class);
+        Plane plane = PlaneMapper.INSTANCE.planeDtoToPlane(planeForUpdate);
         log.debug("updateById() Controller - end: id = {}", id);
-        return converter.toDto(planeService.updateById(plane, id));
+        return PlaneMapper.INSTANCE.planeToPlaneDto(plane);
     }
 
     @PatchMapping("/planes/{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public PlaneDeleteDto removeById(@PathVariable Integer id) {
+        PlaneDeleteDto planeDeleteDto = PlaneMapper.INSTANCE.planeToPlaneDeleteDto(planeService.getById(id));
         planeService.removeById(id);
-        return converter.toDeleteDto(planeService.getById(id));
+        return planeDeleteDto;
     }
 
 
@@ -73,7 +72,7 @@ public class PlaneController {
     @ResponseStatus(HttpStatus.OK)
     public PlaneDto findPlaneByName(String name) {
         log.debug("findPlaneByName() Controller - start: name = {}", name);
-        PlaneDto dto = converter.toDto(planeService.findPlaneByName(name));
+        PlaneDto dto = PlaneMapper.INSTANCE.planeToPlaneDto(planeService.findPlaneByName(name));
         log.debug("findPlaneByName() Controller - end: id = {}", planeService.findPlaneByName(name).getId());
         return dto;
     }
@@ -86,11 +85,12 @@ public class PlaneController {
 
     @PatchMapping(value = "/planes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateDate(@RequestParam("datetime")
+    public PlaneDto updateDate(@RequestParam("datetime")
                            @DateTimeFormat() String ldc,
                            @PathVariable Integer id) {
         LocalDateTime localDateTime = LocalDateTime.parse(ldc, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         planeService.updateDate(id, localDateTime);
+        return PlaneMapper.INSTANCE.planeToPlaneDto(planeService.getById(id));
     }
 
 

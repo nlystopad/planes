@@ -3,7 +3,7 @@ package com.lystopad.planes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.dto.PlaneDto;
-import com.lystopad.planes.utils.config.PlaneConverter;
+import com.lystopad.planes.utils.config.PlaneMapper;
 import com.lystopad.planes.web.PlaneController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,6 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,14 +39,13 @@ public class ControllerTests {
     ObjectMapper mapper;
     @MockBean
     private PlaneController controller;
-    @Autowired
-    private PlaneConverter converter;
+
 
 
     @Test
     public void createPlaneSuccess() throws Exception {
         Plane plane = Plane.builder().name("F-18").isFighter(true).creationDate(LocalDateTime.now()).ammunition(5).build();
-        PlaneDto dto = converter.toDto(plane);
+        PlaneDto dto = PlaneMapper.INSTANCE.planeToPlaneDto(plane);
         Mockito.when(controller.createPlane(dto)).thenReturn(dto);
 
         MockHttpServletRequestBuilder mockRequest = post("/api/planes")
@@ -61,7 +59,7 @@ public class ControllerTests {
     @Test
     public void getPlaneByIdSuccess() throws Exception {
         Plane plane = Plane.builder().name("F-16").ammunition(5).build();
-        PlaneDto dto = converter.toDto(plane);
+        PlaneDto dto = PlaneMapper.INSTANCE.planeToPlaneDto(plane);
 
         Mockito.when(controller.getById(plane.getId())).thenReturn(dto);
 
@@ -73,7 +71,7 @@ public class ControllerTests {
     @Test
     public void getAllPlanesSuccess() throws Exception {
         Plane plane = Plane.builder().name("F-18").isFighter(true).build();
-        PlaneDto dto = converter.toDto(plane);
+        PlaneDto dto = PlaneMapper.INSTANCE.planeToPlaneDto(plane);
 
         Collection<Plane> records = new ArrayList<>(List.of(plane));
 

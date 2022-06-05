@@ -16,7 +16,7 @@ public class PlaneDto {
 
     public int ammunition;
 
-    @NotNull
+    @NotNull(message = "field isFighter must be filled")
     public boolean isFighter;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

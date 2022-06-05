@@ -1,14 +1,16 @@
 package com.lystopad.planes.utils.config;
 
 import com.lystopad.planes.domain.Plane;
+import com.lystopad.planes.dto.PlaneDeleteDto;
 import com.lystopad.planes.dto.PlaneDto;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MappingContext;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-public class PlaneMapper extends CustomMapper<Plane, PlaneDto> {
+@Mapper
+public interface PlaneMapper {
+    PlaneMapper INSTANCE  = Mappers.getMapper(PlaneMapper.class);
 
-    @Override
-    public void mapBtoA(PlaneDto dto, Plane plane, MappingContext context) {
-        super.mapBtoA(dto, plane, context);
-    }
+    PlaneDto planeToPlaneDto(Plane plane);
+    Plane planeDtoToPlane(PlaneDto dto);
+    PlaneDeleteDto planeToPlaneDeleteDto(Plane plane);
 }
