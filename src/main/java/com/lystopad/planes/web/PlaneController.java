@@ -30,7 +30,7 @@ public class PlaneController {
     @PostMapping("/planes")
     @ResponseStatus(HttpStatus.CREATED)
     public PlaneDto createPlane(@RequestBody @Valid PlaneDto planeForSave) {
-        Plane plane = converter.getMapperFacade().map(planeForSave, Plane.class);
+        var plane = converter.getMapperFacade().map(planeForSave, Plane.class);
         return converter.toDto(planeService.create(plane));
     }
 
@@ -44,9 +44,9 @@ public class PlaneController {
     @ResponseStatus(HttpStatus.OK)
     public PlaneDto getById(@PathVariable Integer id) {
         log.debug("getById() Controller - start: id = {}", id);
-        Plane plane = planeService.getById(id);
+        var plane = planeService.getById(id);
         log.debug("getById() Controller - to dto start: id = {}", id);
-        PlaneDto dto = converter.toDto(plane);
+        var dto = converter.toDto(plane);
         log.debug("getById() Controller - end: name = {}", dto.name);
         return dto;
 
@@ -56,7 +56,7 @@ public class PlaneController {
     @ResponseStatus(HttpStatus.OK)
     public PlaneDto updateById(@RequestBody @Valid PlaneDto planeForUpdate, @PathVariable Integer id) {
         log.debug("updateById() Controller - start: id = {}", id);
-        Plane plane = converter.getMapperFacade().map(planeForUpdate, Plane.class);
+        var plane = converter.getMapperFacade().map(planeForUpdate, Plane.class);
         log.debug("updateById() Controller - end: id = {}", id);
         return converter.toDto(planeService.updateById(plane, id));
     }
@@ -64,8 +64,9 @@ public class PlaneController {
     @PatchMapping("/planes/{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public PlaneDeleteDto removeById(@PathVariable Integer id) {
+        var planeToReturn = converter.toDeleteDto(planeService.getById(id));
         planeService.removeById(id);
-        return converter.toDeleteDto(planeService.getById(id));
+        return planeToReturn;
     }
 
 
@@ -73,7 +74,7 @@ public class PlaneController {
     @ResponseStatus(HttpStatus.OK)
     public PlaneDto findPlaneByName(String name) {
         log.debug("findPlaneByName() Controller - start: name = {}", name);
-        PlaneDto dto = converter.toDto(planeService.findPlaneByName(name));
+        var dto = converter.toDto(planeService.findPlaneByName(name));
         log.debug("findPlaneByName() Controller - end: id = {}", planeService.findPlaneByName(name).getId());
         return dto;
     }
@@ -89,7 +90,7 @@ public class PlaneController {
     public void updateDate(@RequestParam("datetime")
                            @DateTimeFormat() String ldc,
                            @PathVariable Integer id) {
-        LocalDateTime localDateTime = LocalDateTime.parse(ldc, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        var localDateTime = LocalDateTime.parse(ldc, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         planeService.updateDate(id, localDateTime);
     }
 

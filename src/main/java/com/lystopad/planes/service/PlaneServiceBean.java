@@ -24,7 +24,7 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public Plane create(Plane plane) {
         log.info("create() - start: plane = {}", plane);
-        Plane saved = planeRepository.save(plane);
+        var saved = planeRepository.save(plane);
         log.info("create() - end: id = {}", saved.getId());
         return saved;
     }
@@ -32,7 +32,7 @@ public class PlaneServiceBean implements PlaneService {
 
     @Override
     public List<Plane> getAll() {
-        List<Plane> all = planeRepository.findAll();
+        var all = planeRepository.findAll();
         List<Plane> returnList = new ArrayList<>();
         for (Plane p : all) {
             log.info("getAll() - checking plane with id = {}", p.getId());
@@ -46,7 +46,7 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public Plane getById(Integer id) {
         log.info("getById() - start: id = {}", id);
-        Plane plane = returnPlane(id);
+        var plane = returnPlane(id);
         log.debug("getById() -> checkDeleted() - start: id = {}", id);
         checkDeleted(plane);
         log.info("getById() - end: plane = {}", plane);
@@ -79,7 +79,7 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public void removeById(Integer id) {
         log.info("removeById() - start: id = {}", id);
-        Plane plane = returnPlane(id);
+        var plane = returnPlane(id);
         log.info("removeById() -> checkDeleted() - start: id = {}", id);
         checkDeleted(plane);
         log.info("removeById() -> checkDeleted() - end: id = {}", id);
@@ -92,7 +92,7 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public Plane findPlaneByName(String name) {
         log.info("findPlaneByName() - start: name = {}", name);
-        Plane plane = planeRepository.findByName(name);
+        var plane = planeRepository.findByName(name);
         log.info("findPlaneByName() -> checkDeleted() - start: id = {}", plane.getId());
         checkDeleted(plane);
         log.info("findPlaneByName() - end: plane = {}", plane);
@@ -102,7 +102,7 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public Collection<Plane> findPlaneByFighter() {
         log.info("findPlaneByFighter() - start");
-        Collection<Plane> collection = planeRepository.findByFighter();
+        var collection = planeRepository.findByFighter();
         Collection<Plane> returnList = new ArrayList<>();
         for (Plane p : collection) {
             log.info("findPlaneByFighter() - check deleted for plane with id = {}", p.getId());

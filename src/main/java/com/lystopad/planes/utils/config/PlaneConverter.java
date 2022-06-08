@@ -18,15 +18,16 @@ public class PlaneConverter {
         return mapperFacade;
     }
 
-    public PlaneDto toDto(Plane entity){
+    public PlaneDto toDto(Plane entity) {
         return mapperFacade.map(entity, PlaneDto.class);
     }
 
-    public PlaneDeleteDto toDeleteDto(Plane entity){
-        return mapperFacade.map(entity, PlaneDeleteDto.class);
+
+    public Plane fromDto(PlaneDto dto) {
+        return mapperFacade.map(dto, Plane.class);
     }
 
-    public  Plane fromDto(PlaneDto dto) {
-        return mapperFacade.map(dto, Plane.class);
+    public PlaneDeleteDto toDeleteDto(Plane entity) {
+        return mapperFacade.map(entity, PlaneDeleteDto.class);
     }
 }
