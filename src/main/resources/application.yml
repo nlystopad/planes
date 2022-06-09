@@ -26,3 +26,9 @@ logging:
     org.springframework: info
     org.hibernate: info
     com.lystopad.planes: info
+# Swagger configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html # swagger-ui custom path
+  api-docs:
+    path: /v3/api-docs.yaml

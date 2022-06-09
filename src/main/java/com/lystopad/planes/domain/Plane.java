@@ -2,6 +2,7 @@ package com.lystopad.planes.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -19,14 +20,21 @@ public class Plane {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
+    @Schema(description = "id of plane", pattern = "sequence")
     private Integer id;
+    @Schema(description = "Name of plane", example = "F-16", required = true)
     private String name;
+    @Schema(description = "Quantity of planes ammunition", example = "18")
     private int ammunition;
+    @Schema(description = "Flag which should be set if plane is fighter", allowableValues = {"true", "false"}, name = "Fighter")
     private boolean isFighter;
+    @Schema(description = "Date and time of creation of plane", pattern = "yyyy-MM-dd HH:mm", required = true, name = "Creation date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime creationDate;
+    @Schema(description = "Quantity of crew of this plane", name = "Crew quantity", example = "2")
     private int crewQuantity;
     @JsonIgnore
+    @Schema(hidden = true)
     private Boolean isDeleted = Boolean.FALSE;
 
     public Integer getId() {

@@ -3,96 +3,90 @@ package com.lystopad.planes.web;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.dto.PlaneDeleteDto;
 import com.lystopad.planes.dto.PlaneDto;
-import com.lystopad.planes.service.PlaneService;
-import com.lystopad.planes.utils.config.PlaneConverter;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
-@RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
-@AllArgsConstructor
-@Slf4j
-public class PlaneController {
+public interface PlaneController {
 
-    private final PlaneService planeService;
 
-    private final PlaneConverter converter;
-
-    @PostMapping("/planes")
     @ResponseStatus(HttpStatus.CREATED)
-    public PlaneDto createPlane(@RequestBody @Valid PlaneDto planeForSave) {
-        var plane = converter.getMapperFacade().map(planeForSave, Plane.class);
-        return converter.toDto(planeService.create(plane));
-    }
+    @Operation(summary = "This is endpoint to add a new plane.", description = "Create request to add a new plane.", tags = {"Plane"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "CREATED. The new plane is successfully created and added to database."),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND. Specified plane request not found."),
+            @ApiResponse(responseCode = "409", description = "Plane already exists")})
+    PlaneDto createPlane(PlaneDto planeForSave);
 
-    @GetMapping("/planes")
+    @Operation(summary = "This is endpoint to get all existing planes.", description = "Read request to get all planes which exist in database", tags = {"Plane"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Here are your planes."),
+            @ApiResponse(responseCode = "204", description = "Whoops, looks like there are no planes in database"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "403", description = "Sorry, you don't have enough access rights to get all planes."),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND. Specified plane request not found.")
+    })
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Plane> getAll() {
-        return planeService.getAll();
-    }
+    Collection<Plane> getAll();
 
-    @GetMapping("/planes/{id}")
+    @Operation(summary = "This is endpoint to get 1 existing plane by its id.", description = "Read request to get 1 plane by id", tags = {"PlaneDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Here is your plane."),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes with such id in database"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+    })
     @ResponseStatus(HttpStatus.OK)
-    public PlaneDto getById(@PathVariable Integer id) {
-        log.debug("getById() Controller - start: id = {}", id);
-        var plane = planeService.getById(id);
-        log.debug("getById() Controller - to dto start: id = {}", id);
-        var dto = converter.toDto(plane);
-        log.debug("getById() Controller - end: name = {}", dto.name);
-        return dto;
+    PlaneDto getById(Integer id);
 
-    }
-
-    @PutMapping("/planes/{id}")
+    @Operation(summary = "This is endpoint to update 1 existing plane by its id.", description = "Update request to change all fields of 1 plane by id", tags = {"PlaneDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Here is your updated plane."),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes with such id in database")
+    })
     @ResponseStatus(HttpStatus.OK)
-    public PlaneDto updateById(@RequestBody @Valid PlaneDto planeForUpdate, @PathVariable Integer id) {
-        log.debug("updateById() Controller - start: id = {}", id);
-        var plane = converter.getMapperFacade().map(planeForUpdate, Plane.class);
-        log.debug("updateById() Controller - end: id = {}", id);
-        return converter.toDto(planeService.updateById(plane, id));
-    }
+    PlaneDto updateById(PlaneDto planeForUpdate, Integer id);
 
-    @PatchMapping("/planes/{id}/delete")
+    @Operation(summary = "This is endpoint to delete 1 existing plane by its id.", description = "Delete request to remove 1 plane from database by its id", tags = {"PlaneDeleteDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Plane with this id was deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes with such id in database")
+    })
     @ResponseStatus(HttpStatus.OK)
-    public PlaneDeleteDto removeById(@PathVariable Integer id) {
-        var planeToReturn = converter.toDeleteDto(planeService.getById(id));
-        planeService.removeById(id);
-        return planeToReturn;
-    }
+    PlaneDeleteDto removeById(Integer id);
 
-
-    @GetMapping(value = "/planes", params = {"name"})
+    @Operation(summary = "This is endpoint to find 1 existing plane by its name.", description = "Read request to get 1 plane from database by its name", tags = {"PlaneDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Here is your plane"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes with such id in database")
+    })
     @ResponseStatus(HttpStatus.OK)
-    public PlaneDto findPlaneByName(String name) {
-        log.debug("findPlaneByName() Controller - start: name = {}", name);
-        var dto = converter.toDto(planeService.findPlaneByName(name));
-        log.debug("findPlaneByName() Controller - end: id = {}", planeService.findPlaneByName(name).getId());
-        return dto;
-    }
+    PlaneDto findPlaneByName(String name);
 
-    @GetMapping(value = "/planes/fighters")
+    @Operation(summary = "This is endpoint to find all existing plane which are fighters.", description = "Read request to get all planes from database by its id", tags = {"Plane"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Plane with this id was deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes which are fighters in database")
+    })
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Plane> findPlaneByFighter() {
-        return planeService.findPlaneByFighter();
-    }
+    Collection<Plane> findPlaneByFighter();
 
-    @PatchMapping(value = "/planes/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateDate(@RequestParam("datetime")
-                           @DateTimeFormat() String ldc,
-                           @PathVariable Integer id) {
-        var localDateTime = LocalDateTime.parse(ldc, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        planeService.updateDate(id, localDateTime);
-    }
+    @Operation(summary = "This is endpoint to update date and time of creation of 1 plane by its id.", description = "Update request to update date of creation of 1 plane from database by its id", tags = {"PlaneDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Date of your plane was updated"),
+            @ApiResponse(responseCode = "401", description = "Looks like you are not authorized"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no planes which are fighters in database")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    PlaneDto updateDate(String ldc, Integer id);
 
 
 }

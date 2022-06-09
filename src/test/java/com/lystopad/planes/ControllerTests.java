@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.dto.PlaneDto;
 import com.lystopad.planes.utils.config.PlaneConverter;
-import com.lystopad.planes.web.PlaneController;
+import com.lystopad.planes.web.PlaneControllerBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -38,7 +38,7 @@ public class ControllerTests {
     @Autowired
     ObjectMapper mapper;
     @MockBean
-    private PlaneController controller;
+    private PlaneControllerBean controller;
     @Autowired
     private PlaneConverter converter;
 
