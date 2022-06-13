@@ -102,6 +102,13 @@ public class Plane {
         return getAmmunition() == plane.getAmmunition() && isFighter() == plane.isFighter() && getCrewQuantity() == plane.getCrewQuantity() && getId().equals(plane.getId()) && getName().equals(plane.getName()) && getCreationDate().equals(plane.getCreationDate());
     }
 
+    public boolean compareWithObject(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Plane)) return false;
+        Plane plane = (Plane) o;
+        return getAmmunition() == plane.getAmmunition() && isFighter() == plane.isFighter() && getCrewQuantity() == plane.getCrewQuantity() && getName().equals(plane.getName()) && getCreationDate().equals(plane.getCreationDate());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getName(), getAmmunition(), isFighter(), getCreationDate(), getCrewQuantity());

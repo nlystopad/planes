@@ -15,18 +15,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ErrorDetails details = new ErrorDetails(new Date(), "Plane with such id doesn't exist", request.getDescription(false));
+        var details = new ErrorDetails(new Date(), "Plane with such id doesn't exist", request.getDescription(false));
         return new ResponseEntity<>(details, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ResourceWasDeletedException.class)
-    protected ResponseEntity<MyGlobalExceptionHandler> handleDeleteException(){
+    protected ResponseEntity<MyGlobalExceptionHandler> handleDeleteException() {
         return new ResponseEntity<>(new MyGlobalExceptionHandler("This plane was deleted"), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(AlreadyExistException.class)
+    public ResponseEntity<?> handleAlreadyExistException(WebRequest request) {
+        var details = new ErrorDetails(new Date(), "This plane already exist in database", request.getDescription(false));
+        return new ResponseEntity<>(details, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request){
-        ErrorDetails details = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
+        var details = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(details, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

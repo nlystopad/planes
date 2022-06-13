@@ -2,6 +2,7 @@ package com.lystopad.planes.service;
 
 import com.lystopad.planes.domain.Plane;
 import com.lystopad.planes.repository.PlaneRepository;
+import com.lystopad.planes.utils.exception.AlreadyExistException;
 import com.lystopad.planes.utils.exception.ResourceNotFoundException;
 import com.lystopad.planes.utils.exception.ResourceWasDeletedException;
 import lombok.AllArgsConstructor;
@@ -24,9 +25,20 @@ public class PlaneServiceBean implements PlaneService {
     @Override
     public Plane create(Plane plane) {
         log.info("create() - start: plane = {}", plane);
+        checkAlreadyExist(plane);
         var saved = planeRepository.save(plane);
         log.info("create() - end: id = {}", saved.getId());
         return saved;
+
+    }
+
+    private void checkAlreadyExist(Plane plane) {
+        log.info("checkAlreadyExist() -> start: plane = {}", plane);
+        Plane byName = planeRepository.findByName(plane.getName());
+        if (byName != null && byName.compareWithObject(plane)) {
+            throw new AlreadyExistException();
+        }
+        log.info("checkAlreadyExist() -> end");
     }
 
 
