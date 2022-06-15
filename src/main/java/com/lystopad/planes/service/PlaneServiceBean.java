@@ -1,6 +1,8 @@
 package com.lystopad.planes.service;
 
+import com.lystopad.planes.domain.Pilot;
 import com.lystopad.planes.domain.Plane;
+import com.lystopad.planes.repository.PilotRepository;
 import com.lystopad.planes.repository.PlaneRepository;
 import com.lystopad.planes.utils.exception.AlreadyExistException;
 import com.lystopad.planes.utils.exception.ResourceNotFoundException;
@@ -21,6 +23,8 @@ import java.util.List;
 public class PlaneServiceBean implements PlaneService {
 
     private final PlaneRepository planeRepository;
+
+    private final PilotRepository pilotRepository;
 
     @Override
     public Plane create(Plane plane) {
@@ -131,6 +135,23 @@ public class PlaneServiceBean implements PlaneService {
         log.info("updateDate() - start");
         planeRepository.updatePlane(id, dateTime);
         log.info("updateDate() - end");
+    }
+
+    @Override
+    public Pilot getPilotByPlaneId(Integer id) {
+        log.info("getPilotByPlaneId() - start : id = {}", id);
+        var pilot = pilotRepository.getPilotByIdOfPlane(id);
+        log.info("getPilotByPlaneId() - end : pilot = {}", pilot);
+        return pilot;
+    }
+
+    @Override
+    public Plane addMainPilot(Integer id, Pilot pilot) {
+        return planeRepository.findById(id)
+                .map(entity -> {
+                    entity.setMainPilot(pilot);
+                    return planeRepository.save(entity);
+                }).orElseThrow(ResourceNotFoundException::new);
     }
 
 

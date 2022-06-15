@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-
 import java.time.LocalDateTime;
 
 public class PlaneDto {
@@ -29,6 +27,9 @@ public class PlaneDto {
 
     @Schema(description = "Quantity of crew of this plane")
     public int crewQuantity;
+
+    @Schema(hidden = true)
+    public PilotDto mainPilot;
 
 
 }

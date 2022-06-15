@@ -1,13 +1,14 @@
 package com.lystopad.planes.web;
 
 import com.lystopad.planes.domain.Plane;
+import com.lystopad.planes.dto.PilotDto;
 import com.lystopad.planes.dto.PlaneDeleteDto;
 import com.lystopad.planes.dto.PlaneDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collection;
 
@@ -88,5 +89,20 @@ public interface PlaneController {
     @ResponseStatus(HttpStatus.OK)
     PlaneDto updateDate(String ldc, Integer id);
 
+    @Operation(summary = "This is endpoint to add main pilot for plane", description = "Update request to add main pilot of 1 plane in database by its id", tags = {"PlaneDto", "PilotDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Main pilot was successfully added"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there are no such planes in database")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    PlaneDto addMainPilot(Integer id, PilotDto mainPilot);
+
+    @Operation(summary = "This is endpoint to get pilot by id of plane", description = "Get request to get information about pilot by id of plane", tags = {"PilotDto"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok. Here is your pilot"),
+            @ApiResponse(responseCode = "404", description = "Sorry, there is no plane with such id")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    PilotDto getPilotByPlaneId(Integer id);
 
 }

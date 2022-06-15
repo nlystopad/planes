@@ -1,5 +1,6 @@
 package com.lystopad.planes.service;
 
+import com.lystopad.planes.domain.Pilot;
 import com.lystopad.planes.domain.Plane;
 
 import java.time.LocalDateTime;
@@ -24,4 +25,8 @@ public interface PlaneService {
     Collection<Plane> findPlaneByFighter();
 
     void updateDate(Integer id, LocalDateTime dateTime);
+
+    Pilot getPilotByPlaneId(Integer id);
+
+    Plane addMainPilot(Integer id, Pilot pilot);
 }
